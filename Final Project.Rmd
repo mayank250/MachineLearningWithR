@@ -1,0 +1,281 @@
+---
+title: 'Project: Predict attributes causing Heart Disease'
+author: "Mayank And Aashka"
+output: word_document
+---
+
+##Import dataset -
+
+```{r}
+system("java -version")
+library("readxl")
+heart_data <- read_excel("C:/Users/mayan/OneDrive/Documents/heart_data.xlsx")
+#View(heart_data)
+
+```
+# Exploring the Data Set
+```{r}
+
+dim(heart_data)
+
+```
+# Data: 16 columns(Variables) and 4238 observations
+```{r}
+
+str(heart_data)
+
+```
+
+```{r}
+
+heart_data$TenYearCHD <- factor(heart_data$TenYearCHD)
+summary(heart_data)
+
+```
+
+```{r}
+
+levels(heart_data$TenYearCHD)
+
+```
+
+
+```{r}
+
+sum(is.na(heart_data))
+
+```
+# Cheking for Missing values
+
+```{r}
+
+heart_data <- na.omit(heart_data)
+sum(is.na(heart_data))
+
+```
+
+```{r}
+
+normalize <- function(x) { (x - min(x)) / (max(x) - min(x))}
+heart_data$totChol <- normalize(heart_data$totChol)
+heart_data$sysBP <- normalize(heart_data$sysBP)
+heart_data$diaBP <- normalize(heart_data$diaBP)
+heart_data$BMI <- normalize(heart_data$BMI)
+heart_data$heartRate <- normalize(heart_data$heartRate)
+heart_data$glucose <- normalize(heart_data$glucose)
+
+#install.packages("ggplot2")
+#install.packages("GGally")
+#install.packages("corrplot")
+
+library(ggplot2)
+library(GGally)
+library(tidyverse)
+library(dplyr)
+correlation <- cor(heart_data [,-16], method = "pearson" , use = "complete.obs")
+library(corrplot)
+round(correlation,2)
+whiteblack <- c("white", "black")
+corrplot(correlation, order = "hclust",  bg = "darkorange")
+```
+# Normalized the data set.
+# By looking at the below correlation plot, there's moderately high correlation between pelvic incidence and sacral slope.
+
+
+#Here is presentation of box plot-graphs to check the outliers corresponding each predictor variable.
+```{r}
+
+boxplot(heart_data$male, heart_data$age, heart_data$education,heart_data$currentSmoker, heart_data$cigsPerDay, heart_data$BPMeds, heart_data$prevalentStroke, heart_data$prevalentHyp, notch=FALSE,col=(c("red","darkgreen")),main="Heart Data")
+
+boxplot(heart_data$diabetes, heart_data$totChol, heart_data$sysBP, heart_data$diaBP, heart_data$BMI, heart_data$heartRate, heart_data$glucose, heart_data$TenYearCHD, notch=TRUE,col=(c("darkslategray1","goldenrod1")))
+
+# Load the dataset 
+data("heart_data")
+
+# Create a boxplot of the dataset, outliers are shown as two distinct points
+boxplot(heart_data)$out
+
+
+#detecting outliers
+boxplot(heart_data$male, heart_data$age, heart_data$education,heart_data$currentSmoker, heart_data$cigsPerDay, heart_data$BPMeds, heart_data$prevalentStroke, heart_data$prevalentHyp, plot=FALSE)$out
+
+#Defining outliers as a vector
+outliers <- boxplot(heart_data$male, heart_data$age, heart_data$education,heart_data$currentSmoker, heart_data$cigsPerDay, heart_data$BPMeds, heart_data$prevalentStroke, heart_data$prevalentHyp, plot=FALSE)$out
+
+# Removing Outliers
+heart_data <- heart_data[-which(c(heart_data$male, heart_data$age, heart_data$education,heart_data$currentSmoker, heart_data$cigsPerDay, heart_data$BPMeds, heart_data$prevalentStroke, heart_data$prevalentHyp) %in% outliers),]
+
+boxplot(heart_data)
+
+```
+
+# Performing Data Mining Techniques #
+# Preparing Data Set in to Train Data (80%) and Test Data (20%)
+
+```{r}
+
+set.seed(123)
+library(caTools)
+sample <- sample.split(heart_data, SplitRatio = 0.80)
+train <- subset(heart_data, sample == TRUE)
+test1 <- subset(heart_data, sample == FALSE)
+test <- test1[,-16]
+train_knn <- train[,-16]
+actual.results <- as.vector(test1$TenYearCHD)
+train.result <- as.vector(train$TenYearCHD)
+
+```
+
+# (1) K-nearest neighbours algorithms:
+```{r}
+
+library(class)
+library(gmodels)
+
+#For k=1
+knn_pred.result1 <- knn(train_knn, test, train.result, k=1 )
+table(knn_pred.result1, actual.results)
+misClassificError <- mean(knn_pred.result1 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=2
+knn_pred.result2 <- knn(train_knn, test, train.result, k=2 )
+table(knn_pred.result2, actual.results)
+misClassificError <- mean(knn_pred.result2 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=3
+knn_pred.result3 <- knn(train_knn, test, train.result, k=3 )
+table(knn_pred.result3, actual.results)
+misClassificError <- mean(knn_pred.result3 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=4
+knn_pred.result4 <- knn(train_knn, test, train.result, k=4 )
+table(knn_pred.result4, actual.results)
+misClassificError <- mean(knn_pred.result4 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=5
+knn_pred.result5 <- knn(train_knn, test, train.result, k=5 )
+table(knn_pred.result5, actual.results)
+misClassificError <- mean(knn_pred.result5 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=6
+knn_pred.result6 <- knn(train_knn, test, train.result, k=6 )
+table(knn_pred.result6, actual.results)
+misClassificError <- mean(knn_pred.result6 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=7
+knn_pred.result7 <- knn(train_knn, test, train.result, k=7 )
+table(knn_pred.result7, actual.results)
+misClassificError <- mean(knn_pred.result7 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=8
+knn_pred.result8 <- knn(train_knn, test, train.result, k=8 )
+table(knn_pred.result8, actual.results)
+misClassificError <- mean(knn_pred.result8 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=9
+knn_pred.result9 <- knn(train_knn, test, train.result, k=9 )
+table(knn_pred.result9, actual.results)
+misClassificError <- mean(knn_pred.result9 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=10
+knn_pred.result10 <- knn(train_knn, test, train.result, k=10 )
+table(knn_pred.result10, actual.results)
+misClassificError <- mean(knn_pred.result10 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+#For k=10, we are getting the best accuracy which is 84.23%. Hence, we can select k=10 as the best value of k.
+
+```
+
+# For K = 6 we have got best results 87.27% accuracy, according to model, we can select K = 6 as best K value.
+
+
+
+# (2) Decision Tree Regression:
+```{r}
+
+library(rpart)
+library(rpart.plot)
+
+CT_model1 <- rpart(TenYearCHD ~ . , data = train, method = 'class', control =
+                    rpart.control(minsplit = 30, cp=0.0055))
+printcp(CT_model1)
+rpart.plot(CT_model1, type = 1, extra = 1, split.font = 1, varlen = -20)
+summary(CT_model1)
+
+CT_pred.result1 <-predict(CT_model1, test, type = 'class')
+
+table(CT_pred.result1, actual.results)
+misClassificError <- mean(CT_pred.result1 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+```
+
+
+# For Model 1, we have got 86.92% of the accuracy Considering predictors with importance more 7.
+
+
+```{r}
+CT_model2 <- rpart(TenYearCHD ~ age + sysBP + glucose + totChol, data = train, method = 'class', control=rpart.control(minsplit=30, cp=0.0055))
+print(CT_model2)
+rpart.plot(CT_model2, type = 1, extra = 1, split.font = 1, varlen = -20)
+summary(CT_model2)
+
+CT_pred.result2 <- predict(CT_model2, test, type = 'class')
+
+table(CT_pred.result2, actual.results)
+misClassificError <- mean(CT_pred.result2 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+```
+# For model 2 we observed accuracy 87.09% with considering predictors with importance more than 10.
+# It has improved the accuracy by 0.1%.
+
+
+# Performing another regression models to check accuracy:
+
+# (3) Logistic Regression Analysis:
+```{r}
+logistic_model1 <- glm(TenYearCHD ~ ., data = train, family = binomial)
+summary(logistic_model1)
+
+logistic_pred.results1 <- predict(logistic_model1, test, type= 'response')
+logistic_pred.results1 <- ifelse(logistic_pred.results1 > 0.5,1,0)
+
+table(logistic_pred.results1, actual.results)
+misClassificError <- mean(logistic_pred.results1 != actual.results)
+print(paste('Accuracy',1-misClassificError))
+
+```
+
+# From model 1 of Logistic Regression we can observe that accuracy measures 85.74%
+
+# For P values we are getting more than 0.5, trying to remove them and for better result creating second model:
+
+```{r}
+
+logistic_model2 <- glm(TenYearCHD ~ male + age + cigsPerDay + BPMeds + prevalentStroke + prevalentHyp + totChol + sysBP + glucose, data = train, family = binomial)
+summary(logistic_model2)
+
+logistic_pred.results2 <- predict(logistic_model2, test, type='response')
+logistic_pred.results2 <- ifelse(logistic_pred.results2 > 0.4,1,0)
+
+table(logistic_pred.results2, actual.results)
+misClassificError <- mean(logistic_pred.results2 != actual.results)
+print(paste('Accuracy', 1-misClassificError))
+
+```
+
+# For second model we have got 87.09% accuracy with lesser AIC value comparision of model 1.
+
+# Second Model would be more significant to select.
+
