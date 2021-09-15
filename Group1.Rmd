@@ -1,0 +1,173 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+```{r}
+# Group 1
+# HOMEWORK 1
+# AASHKA SHAH  : 001081495
+# MAYANK MEHTA : 001401159
+```
+
+
+```{r}
+# Problem 1 (A)
+forestfires.df <- read.csv("forestfires.csv")
+#View(forestfires)
+
+par(mfrow=c(2,2))
+plot(forestfires.df$temp,forestfires.df$area)
+title("Regression of Temperature on Area")
+plot(forestfires.df$month,forestfires.df$area)
+title("Regression of Month on Area")
+plot(forestfires.df$RH,forestfires.df$area)
+title("Regression of RH on Area")
+plot(forestfires.df$DC,forestfires.df$area)
+title("Regression of DC on Area")
+```
+
+```{r}
+# Problem 1(B)
+h <- hist(forestfires.df$wind)
+```
+
+```{r}
+# Problem 1(C)
+summary(forestfires.df$wind)
+```
+
+```{r}
+# Problem 1(D)
+hist(forestfires.df$wind, freq=FALSE)
+lines(density(forestfires.df$wind),col="blue",lwd=2)
+
+```
+
+```{r}
+# Problem 1(E)
+# install.packages("ggplot2")
+library(ggplot2)
+qplot(forestfires.df$month,data=forestfires.df,geom="density",fill=forestfires.df$month,main="Density plot of wind", adjust = 0.9)
+```
+
+```{r}
+# Problem 1(F)
+pairs(~temp+RH+DC+DMC,data=forestfires.df)
+```
+
+```{r}
+#Problem 2(A)
+
+twitter <- read.csv("File M01_quasi_twitter.csv", header = TRUE)
+
+#View(twitter)
+head(twitter)
+
+hist(log(twitter$friends_count),breaks=5,freq=FALSE, main = "twitter_friends_count")
+lines(density(twitter$friends_count))
+boxplot(twitter$friends_count,main="Boxplot of friends_count")
+
+```
+
+```{r}
+#Problem 2(B)
+summary(twitter$friends_count)
+
+```
+
+```{r}
+#Problem 2(C)
+#Data quality in friends_count variable is very low.
+#As we can see from the summary that the value is negative but the value of freinds_count can never be negative.
+#And the Mean is 1058, median is 324 and max value is 660549 which indicates that data is highly scattered in an unequal manner. It can be seen from the graph that, data is focused at some specific points and has many outliers.
+
+```
+
+```{r}
+#Problem 2(D)
+#install.packages("scatterplot3d")
+library(scatterplot3d)
+attach(twitter)
+par(mfrow=c(1,1))
+
+scatter3d<-scatterplot3d(created_at_year,education,age,pch=5,highlight.3d=TRUE,type="h",main="3D Scatter Plot")
+#fit<-lm(age ~ created_at_year+education)
+#scatter3d$plane3d(fit)
+```
+
+```{r}
+#Problem 2(E)
+opar<-par(no.readonly=TRUE)
+par(mfrow=c(1,2))
+accounts<-c(650,1000,900,300,14900)
+label<-c("UK","Canada","India","Australia","US")
+pct<-round(accounts/sum(accounts)*100)
+label2<-paste(label," ",pct,"%")
+pie(accounts,labels=label2,col=rainbow(length(label2)),main="Pie Chart with Percentages")
+#install.packages("plotrix")
+library(plotrix)
+pie3D(accounts,labels=label2,explode=0.6,main="3D pie chart")
+par(opar)
+```
+
+```{r}
+#Problem 2(F)
+par(mfrow=c(1,1))
+dplot <-density(twitter$created_at_year)
+plot(dplot,main="Kernel Density Plot")
+polygon(dplot,col="black",border="white")
+
+#As we can see that Kernel density plot shows relative probability so We can state that the density was high (0.27) in 2009 then eventually decreased between 0.15 and 0.20 from 2010 to 2013 and then increased again to 0.25 in 2013.
+
+```
+
+```{r}
+
+#Problem 3(A)
+raw_data <- read.csv("raw_data.csv")
+#View(raw_data)
+head(raw_data)
+Ndata<-scale(raw_data,center=TRUE,scale=TRUE)
+#View(Ndata)
+
+```
+
+```{r}
+#Problem 3(B)
+opar<-par(no.readonly = TRUE)
+par(mfrow=c(1,4))
+boxplot(raw_data$A,main="Boxplot-A")
+boxplot(raw_data$B,main="Boxplot-B")
+boxplot(raw_data$C,main="Boxplot-C")
+boxplot(raw_data$D,main="Boxplot-D")
+par(opar)
+
+```
+
+```{r}
+#Problem 3(C)
+par(mfrow=c(1,4))
+boxplot(Ndata[,1],main="Boxplot-A")
+boxplot(Ndata[,2],main="Boxplot-B")
+boxplot(Ndata[,3],main="Boxplot-C")
+boxplot(Ndata[,4],main="Boxplot-D")
+par(opar)
+
+```
+
+```{r}
+#Problem 3(D)
+#As we have just standardized raw data, data behaves same in both datasets. Therefore spread of box plot is similar in both data
+#but after standardizing all four variables are measured on same scale. So, it is easy to compare different variables.
+```
+
+```{r}
+#Problem 3(E)
+plot(x=raw_data$A,y=raw_data$B,xlab="A",ylab="B",main="Scatterplot of A V/S B")
+abline(lm(raw_data$B~raw_data$A), col="Green")
+
+#from scatter plot and line, we can say that correlation between data of A and B is very poor. Any positive or negative trend is not found.
+```
+
+
